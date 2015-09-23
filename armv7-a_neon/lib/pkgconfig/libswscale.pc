@@ -1,12 +1,12 @@
-prefix=./android/armv7-a_neon
+prefix=/home/angzangy/FFmpeg_Android/ffmpeg-2.2.16/android/armv7-a_neon
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
 Name: libswscale
 Description: FFmpeg image rescaling library
-Version: 4.0.100
-Requires: libavutil >= 55.2.100
+Version: 2.5.102
+Requires: libavutil = 52.66.100
 Requires.private: 
 Conflicts:
 Libs: -L${libdir}  -lswscale -lm

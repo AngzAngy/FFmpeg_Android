@@ -1,14 +1,14 @@
-prefix=./android/armv7-a_neon
+prefix=/home/angzangy/FFmpeg_Android/ffmpeg-2.2.16/android/armv7-a_neon
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
 Name: libavformat
 Description: FFmpeg container format library
-Version: 57.2.100
-Requires: libavcodec >= 57.3.100, libswresample >= 2.0.100, libavutil >= 55.2.100
+Version: 55.33.100
+Requires: libavcodec = 55.52.102
 Requires.private: 
 Conflicts:
-Libs: -L${libdir}  -lavformat -lm -lz -pthread -lgcc
+Libs: -L${libdir}  -lavformat -lm -lz -pthread
 Libs.private: 
 Cflags: -I${includedir}
