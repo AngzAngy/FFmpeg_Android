@@ -24,8 +24,8 @@ function build_one
     --arch=arm \
     --enable-cross-compile \
     --sysroot=$SYSROOT \
-    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS" \
-    --extra-ldflags="$ADDI_LDFLAGS" \
+    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/armeabi-v7a/include" \
+    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/armeabi-v7a/lib" \
     $ADDITIONAL_CONFIGURE_FLAG
  
 make clean
