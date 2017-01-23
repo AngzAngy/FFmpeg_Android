@@ -1,0 +1,76 @@
+1.
+git clone https://github.com/arut/nginx-rtmp-module
+
+2.
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
+tar -zxf pcre-8.39.tar.gz
+cd pcre-8.39/
+/configure
+make
+sudo make install
+
+
+3.
+wget http://zlib.net/zlib-1.2.11.tar.gz
+tar -zxf zlib-1.2.11.tar.gz
+cd zlib-1.2.11/
+/configure
+make
+sudo make install
+
+4.
+wget http://www.openssl.org/source/openssl-1.0.2f.tar.gz
+tar -zxf openssl-1.0.2f.tar.gz
+cd openssl-1.0.2f/
+/configure
+make
+sudo make install
+
+5.
+wgethttp://nginx.org/download/nginx-1.11.7.tar.gz
+tar -zxf nginx-1.11.7.tar.gz
+cd  nginx-1.11.7/
+./configure --with-pcre=../pcre-8.39 --with-zlib=../zlib-1.2.11 --with-openssl=../openssl-1.0.2f --prefix=/usr/local/nginx --add-module=../nginx-rtmp-module --with-http_ssl_module
+make
+sudo make install
+
+6.
+cd /usr/local/nginx
+sudo vi conf/nginx.conf
+
+rtmp {
+    server {
+        listen 1935;
+        chunk_size 4096;
+        application myapp {
+            live on;
+        }
+        application hls {
+            live on;
+            hls on;
+            hls_path /tmp/hls;
+        }
+    }
+}
+
+sudo ./sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+
+netstat -ntlp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:139             0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:1935            0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.1.1:53            0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:445             0.0.0.0:*               LISTEN      -               
+tcp6       0      0 :::139                  :::*                    LISTEN      -               
+tcp6       0      0 :::22                   :::*                    LISTEN      -               
+tcp6       0      0 :::445                  :::*                    LISTEN      -
+
+
+7.
+ffmpeg -re -i rtmp-test.mkv -vprofile baseline -vcodec copy -acodec copy -strict -2 -f flv rtmp://172.17.72.23:1935/myapp/test2
+ffplay rtmp://172.17.72.23:1935/myapp/test2
