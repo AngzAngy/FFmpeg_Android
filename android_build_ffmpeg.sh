@@ -8,9 +8,12 @@ function build_one
     --prefix=$PREFIX \
     --disable-shared \
     --enable-static \
-    --enable-encoder=aac \
     --enable-libx264 \
+    --enable-libfaac \
+    --enable-nonfree \
     --enable-gpl \
+    --enable-encoder=libx264 \
+    --enable-encoder=libfaac\
     --disable-doc \
     --disable-ffmpeg \
     --disable-ffplay \
@@ -24,8 +27,8 @@ function build_one
     --arch=arm \
     --enable-cross-compile \
     --sysroot=$SYSROOT \
-    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/armeabi-v7a/include" \
-    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/armeabi-v7a/lib" \
+    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/armeabi-v7a/include -I./external/faaclibs/armeabi-v7a/include" \
+    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/armeabi-v7a/lib -L./external/faaclibs/armeabi-v7a/lib" \
     $ADDITIONAL_CONFIGURE_FLAG
  
 make clean
