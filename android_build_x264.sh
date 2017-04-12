@@ -12,11 +12,9 @@
 
 export NDK=/home/kuwo/devtools/android-ndk-r13
 
-TOOLCHAINS=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
-
 ### armeabi-v7a ###
 SYSROOT=$NDK/platforms/android-9/arch-arm/
-CROSS_PREFIX=$TOOLCHAINS/bin/arm-linux-androideabi-
+CROSS_PREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 EXTRA_CFLAGS="-march=armv7-a -mfloat-abi=softfp -mfpu=neon -mthumb -D__ANDROID__ -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__ -D__ARM_ARCH_7R__ -D__ARM_ARCH_7M__ -D__ARM_ARCH_7S__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/armeabi-v7a
@@ -43,10 +41,9 @@ PREFIX=`pwd`/../x264libs/armeabi-v7a
 make clean
 make STRIP= -j8 install || exit 1
 
-
 ### armeabi ###
-SYSROOT=$TOOLCHAINS/arm/sysroot
-CROSS_PREFIX=$TOOLCHAINS/arm/bin/arm-linux-androideabi-
+SYSROOT=$NDK/platforms/android-9/arch-arm/
+CROSS_PREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 EXTRA_CFLAGS="-march=armv5te -msoft-float -D__ANDROID__ -D__ARM_ARCH_5TE__ -D__ARM_ARCH_5TEJ__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/armeabi
@@ -59,7 +56,7 @@ PREFIX=`pwd`/../x264libs/armeabi
         --extra-ldflags="$EXTRA_LDFLAGS" \
         --enable-pic \
         --enable-static \
-        --enable-shared \
+        --disable-shared \
         --enable-strip \
         --disable-cli \
         --disable-win32thread \
@@ -74,10 +71,9 @@ PREFIX=`pwd`/../x264libs/armeabi
 make clean
 make STRIP= -j8 install || exit 1
 
-
-### arm64-v8a ###
-SYSROOT=$TOOLCHAINS/arm64/sysroot
-CROSS_PREFIX=$TOOLCHAINS/arm64/bin/aarch64-linux-android-
+rm64-v8a ###
+SYSROOT=$NDK/platforms/android-24/arch-arm64/
+CROSS_PREFIX=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
 EXTRA_CFLAGS="-march=armv8-a -D__ANDROID__ -D__ARM_ARCH_8__ -D__ARM_ARCH_8A__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/arm64-v8a
@@ -90,7 +86,7 @@ PREFIX=`pwd`/../x264libs/arm64-v8a
        --extra-ldflags="$EXTRA_LDFLAGS" \
        --enable-pic \
        --enable-static \
-       --enable-shared \
+       --disable-shared \
        --enable-strip \
        --disable-cli \
        --disable-win32thread \
@@ -99,15 +95,15 @@ PREFIX=`pwd`/../x264libs/arm64-v8a
        --disable-lavf \
        --disable-ffms \
        --disable-gpac \
-       --disable-lsmash
+       --disable-lsmash  \
+       --disable-asm
 
 make clean
 make STRIP= -j8 install || exit 1
 
-
 ### x86 ###
-SYSROOT=$TOOLCHAINS/x86/sysroot
-CROSS_PREFIX=$TOOLCHAINS/x86/bin/i686-linux-android-
+SYSROOT=$NDK/platforms/android-24/arch-x86/
+CROSS_PREFIX=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-
 EXTRA_CFLAGS="-march=i686 -mtune=i686 -m32 -mmmx -msse2 -msse3 -mssse3 -D__ANDROID__ -D__i686__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/x86
@@ -120,67 +116,7 @@ PREFIX=`pwd`/../x264libs/x86
         --extra-ldflags="$EXTRA_LDFLAGS" \
         --enable-pic \
         --enable-static \
-        --enable-shared \
-        --enable-strip \
-        --disable-cli \
-        --disable-win32thread \
-        --disable-avs \
-        --disable-swscale \
-        --disable-lavf \
-        --disable-ffms \
-        --disable-gpac \
-        --disable-lsmash
-
-make clean
-make STRIP= -j8 install || exit 1
-
-
-### x86_64 ###
-SYSROOT=$TOOLCHAINS/x86_64/sysroot
-CROSS_PREFIX=$TOOLCHAINS/x86_64/bin/x86_64-linux-android-
-EXTRA_CFLAGS="-march=core-avx-i -mtune=core-avx-i -m64 -mmmx -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mpopcnt -D__ANDROID__ -D__x86_64__"
-EXTRA_LDFLAGS="-nostdlib"
-PREFIX=`pwd`/../x264libs/x86_64
-
-./configure --prefix=$PREFIX \
-       --host=x86_64-linux-android \
-       --sysroot=$SYSROOT \
-       --cross-prefix=$CROSS_PREFIX \
-       --extra-cflags="$EXTRA_CFLAGS" \
-       --extra-ldflags="$EXTRA_LDFLAGS" \
-       --enable-pic \
-       --enable-static \
-       --enable-shared \
-       --enable-strip \
-       --disable-cli \
-       --disable-win32thread \
-       --disable-avs \
-       --disable-swscale \
-       --disable-lavf \
-       --disable-ffms \
-       --disable-gpac \
-       --disable-lsmash
-
-make clean
-make STRIP= -j8 install || exit 1
-
-
-### mips ###
-SYSROOT=$TOOLCHAINS/mips/sysroot
-CROSS_PREFIX=$TOOLCHAINS/mips/bin/mipsel-linux-android-
-EXTRA_CFLAGS="-march=mips32 -mfp32 -mhard-float -D__ANDROID__ -D__mips__"
-EXTRA_LDFLAGS="-nostdlib"
-PREFIX=`pwd`/../x264libs/mips
-
-./configure --prefix=$PREFIX \
-        --host=mipsel-linux-android \
-        --sysroot=$SYSROOT \
-        --cross-prefix=$CROSS_PREFIX \
-        --extra-cflags="$EXTRA_CFLAGS" \
-        --extra-ldflags="$EXTRA_LDFLAGS" \
-        --enable-pic \
-        --enable-static \
-        --enable-shared \
+        --disable-shared \
         --enable-strip \
         --disable-cli \
         --disable-win32thread \
@@ -195,10 +131,69 @@ PREFIX=`pwd`/../x264libs/mips
 make clean
 make STRIP= -j8 install || exit 1
 
+### x86_64 ###
+SYSROOT=$NDK/platforms/android-24/arch-x86_64/
+CROSS_PREFIX=$NDK/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin/x86_64-linux-android-
+EXTRA_CFLAGS="-march=core-avx-i -mtune=core-avx-i -m64 -mmmx -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mpopcnt -D__ANDROID__ -D__x86_64__"
+EXTRA_LDFLAGS="-nostdlib"
+PREFIX=`pwd`/../x264libs/x86_64
+
+./configure --prefix=$PREFIX \
+       --host=x86_64-linux-android \
+       --sysroot=$SYSROOT \
+       --cross-prefix=$CROSS_PREFIX \
+       --extra-cflags="$EXTRA_CFLAGS" \
+       --extra-ldflags="$EXTRA_LDFLAGS" \
+       --enable-pic \
+       --enable-static \
+       --disable-shared \
+       --enable-strip \
+       --disable-cli \
+       --disable-win32thread \
+       --disable-avs \
+       --disable-swscale \
+       --disable-lavf \
+       --disable-ffms \
+       --disable-gpac \
+       --disable-lsmash \
+       --disable-asm
+
+make clean
+make STRIP= -j8 install || exit 1
+
+### mips ###
+SYSROOT=$NDK/platforms/android-24/arch-mips/
+CROSS_PREFIX=$NDK/toolchains/mipsel-linux-android-4.9/prebuilt/linux-x86_64/bin/mipsel-linux-android-
+EXTRA_CFLAGS="-march=mips32 -mfp32 -mhard-float -D__ANDROID__ -D__mips__"
+EXTRA_LDFLAGS="-nostdlib"
+PREFIX=`pwd`/../x264libs/mips
+
+./configure --prefix=$PREFIX \
+        --host=mipsel-linux-android \
+        --sysroot=$SYSROOT \
+        --cross-prefix=$CROSS_PREFIX \
+        --extra-cflags="$EXTRA_CFLAGS" \
+        --extra-ldflags="$EXTRA_LDFLAGS" \
+        --enable-pic \
+        --enable-static \
+       --disable-shared \
+        --enable-strip \
+        --disable-cli \
+        --disable-win32thread \
+        --disable-avs \
+        --disable-swscale \
+        --disable-lavf \
+        --disable-ffms \
+        --disable-gpac \
+        --disable-lsmash \
+        --disable-asm
+
+make clean
+make STRIP= -j8 install || exit 1
 
 ### mips64 ###
-SYSROOT=$TOOLCHAINS/mips64/sysroot
-CROSS_PREFIX=$TOOLCHAINS/mips64/bin/mips64el-linux-android-
+SYSROOT=$NDK/platforms/android-24/arch-mips64/
+CROSS_PREFIX=$NDK/toolchains/mips64el-linux-android-4.9/prebuilt/linux-x86_64/bin/mips64el-linux-android-
 EXTRA_CFLAGS="-march=mips64r6 -D__ANDROID__ -D__mips__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/mips64
@@ -211,7 +206,7 @@ PREFIX=`pwd`/../x264libs/mips64
        --extra-ldflags="$EXTRA_LDFLAGS" \
        --enable-pic \
        --enable-static \
-       --enable-shared \
+       --disable-shared \
        --enable-strip \
        --disable-cli \
        --disable-win32thread \
