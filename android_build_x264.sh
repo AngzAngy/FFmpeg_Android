@@ -39,7 +39,9 @@ PREFIX=`pwd`/../x264libs/armeabi-v7a
         --disable-lsmash
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
 ### armeabi ###
 SYSROOT=$NDK/platforms/android-9/arch-arm/
@@ -69,9 +71,11 @@ PREFIX=`pwd`/../x264libs/armeabi
         --disable-asm
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
-rm64-v8a ###
+## arm64-v8a ###
 SYSROOT=$NDK/platforms/android-24/arch-arm64/
 CROSS_PREFIX=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
 EXTRA_CFLAGS="-march=armv8-a -D__ANDROID__ -D__ARM_ARCH_8__ -D__ARM_ARCH_8A__"
@@ -95,11 +99,12 @@ PREFIX=`pwd`/../x264libs/arm64-v8a
        --disable-lavf \
        --disable-ffms \
        --disable-gpac \
-       --disable-lsmash  \
-       --disable-asm
+       --disable-lsmash
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
 ### x86 ###
 SYSROOT=$NDK/platforms/android-24/arch-x86/
@@ -129,7 +134,9 @@ PREFIX=`pwd`/../x264libs/x86
         --disable-asm
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
 ### x86_64 ###
 SYSROOT=$NDK/platforms/android-24/arch-x86_64/
@@ -159,7 +166,9 @@ PREFIX=`pwd`/../x264libs/x86_64
        --disable-asm
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
 ### mips ###
 SYSROOT=$NDK/platforms/android-24/arch-mips/
@@ -189,9 +198,11 @@ PREFIX=`pwd`/../x264libs/mips
         --disable-asm
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
 
-### mips64 ###
+###mips64 ###
 SYSROOT=$NDK/platforms/android-24/arch-mips64/
 CROSS_PREFIX=$NDK/toolchains/mips64el-linux-android-4.9/prebuilt/linux-x86_64/bin/mips64el-linux-android-
 EXTRA_CFLAGS="-march=mips64r6 -D__ANDROID__ -D__mips__"
@@ -219,4 +230,6 @@ PREFIX=`pwd`/../x264libs/mips64
        --disable-asm
 
 make clean
-make STRIP= -j8 install || exit 1
+make -j4
+make install
+make distclean
