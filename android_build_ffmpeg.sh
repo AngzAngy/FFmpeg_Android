@@ -1,11 +1,10 @@
 export NDK=/home/kuwo/devtools/android-ndk-r13
-SYSROOT=$NDK/platforms/android-9/arch-arm/
-TOOLCHAIN=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
+export PLATFORMS=android-21
 
 function build_one
 {
 ./configure \
-    --prefix=$PREFIX \
+    --prefix=./android/$EABI \
     --disable-shared \
     --enable-static \
     --enable-libx264 \
@@ -22,27 +21,66 @@ function build_one
     --disable-avdevice \
     --disable-doc \
     --disable-symver \
-    --cross-prefix=$TOOLCHAIN/bin/arm-linux-androideabi- \
     --target-os=linux \
-    --arch=arm \
     --enable-cross-compile \
     --sysroot=$SYSROOT \
-    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/armeabi-v7a/include -I./external/faaclibs/armeabi-v7a/include" \
-    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/armeabi-v7a/lib -L./external/faaclibs/armeabi-v7a/lib" \
-    $ADDITIONAL_CONFIGURE_FLAG
- 
+    --arch=$ARCH \
+    --cross-prefix=$TOOLCHAINS \
+    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/$EABI/include -I./external/faaclibs/include" \
+    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/$EABI/lib -L./external/faaclibs/$EABI" \
+    $ADDITIONAL_CONFIGURE_FLAG $OPTIM
+
 make clean
-make  -j4 install
+make -j4
+make install
+make distclean
+echo "install--> `pwd`/android/$EABI" 
 }
 
-#CPU=arm
-#PREFIX=$(pwd)/android/$CPU 
-#OPTIMIZE_CFLAGS="-marm"
-#build_one
+##armeabi
+ARCH=arm
+EABI=armeabi
+SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm/
+TOOLCHAINS=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
+OPTIMIZE_CFLAGS="-marm"
+ADDITIONAL_CONFIGURE_FLAG=--disable-neon
+build_one
 
-#arm v7n
-CPU=armv7-a
-OPTIMIZE_CFLAGS="-O3 -mfloat-abi=softfp -mfpu=neon -marm -march=$CPU -mtune=cortex-a8"
-PREFIX=$(pwd)/android/${CPU}_neon
+##armeabi-v7a
+ARCH=arm
+EABI=armeabi-v7a
+SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm/
+TOOLCHAINS=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
+OPTIMIZE_CFLAGS="-O3 -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8"
 ADDITIONAL_CONFIGURE_FLAG=--enable-neon
+build_one
+
+##arm64-v8a
+ARCH=arm
+EABI=arm64-v8a
+SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm64/
+TOOLCHAINS=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
+OPTIMIZE_CFLAGS="-march=armv8-a -D__ANDROID__ -D__ARM_ARCH_8__ -D__ARM_ARCH_8A__"
+ADDITIONAL_CONFIGURE_FLAG=--disable-neon
+OPTIM=--disable-asm # must disable asm optimized in 64 arch
+build_one
+
+##x86
+ARCH=x86
+EABI=x86
+SYSROOT=$NDK/platforms/$PLATFORMS/arch-x86/
+TOOLCHAINS=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-
+OPTIMIZE_CFLAGS="-march=i686 -mtune=i686 -m32 -mmmx -msse2 -msse3 -mssse3 -D__ANDROID__ -D__i686__"
+ADDITIONAL_CONFIGURE_FLAG=--disable-neon
+OPTIM=--disable-asm # must disable asm optimized in x86 arch
+build_one
+
+##x86_64
+ARCH=x86
+EABI=x86_64
+SYSROOT=$NDK/platforms/$PLATFORMS/arch-x86_64/
+TOOLCHAINS=$NDK/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin/x86_64-linux-android-
+OPTIMIZE_CFLAGS="-march=core-avx-i -mtune=core-avx-i -m64 -mmmx -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mpopcnt -D__ANDROID__ -D__x86_64__"
+ADDITIONAL_CONFIGURE_FLAG=--disable-neon
+OPTIM=--disable-asm # must disable asm optimized in x86_64 arch
 build_one
