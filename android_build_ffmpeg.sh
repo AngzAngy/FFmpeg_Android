@@ -1,5 +1,20 @@
 export NDK=/home/kuwo/devtools/android-ndk-r13
-export PLATFORMS=android-21
+
+CC_VER=4.9
+ARCH=
+EABI=
+TOOLCHAIN=
+SYSROOT=
+ROSSPREFIX=
+TOOLCHAIN_DIR=
+EXTRA_CFLAGS=
+EXTRA_LDFLAGS=
+ADDITIONAL_CONFIGURE_FLAG=
+
+function make_toolchain
+{
+$NDK/build/tools/make-standalone-toolchain.sh --platform=android-21 --toolchain=$TOOLCHAIN$CC_VER --install-dir=$TOOLCHAIN_DIR
+}
 
 function build_one
 {
@@ -25,10 +40,10 @@ function build_one
     --enable-cross-compile \
     --sysroot=$SYSROOT \
     --arch=$ARCH \
-    --cross-prefix=$TOOLCHAINS \
-    --extra-cflags="-Os -fpic $OPTIMIZE_CFLAGS -I./external/x264libs/$EABI/include -I./external/faaclibs/include" \
-    --extra-ldflags="$ADDI_LDFLAGS -L./external/x264libs/$EABI/lib -L./external/faaclibs/$EABI" \
-    $ADDITIONAL_CONFIGURE_FLAG $OPTIM
+    --cross-prefix=$ROSSPREFIX \
+    --extra-cflags="-Os -fpic $EXTRA_CFLAGS -I./external/x264libs/$EABI/include -I./external/faaclibs/include" \
+    --extra-ldflags="$EXTRA_LDFLAGS -L./external/x264libs/$EABI/lib -L./external/faaclibs/$EABI" \
+    $ADDITIONAL_CONFIGURE_FLAG 
 
 make clean
 make -j4
@@ -37,50 +52,64 @@ make distclean
 echo "install--> `pwd`/android/$EABI" 
 }
 
-##armeabi
-ARCH=arm
-EABI=armeabi
-SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm/
-TOOLCHAINS=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
-OPTIMIZE_CFLAGS="-marm"
-ADDITIONAL_CONFIGURE_FLAG=--disable-neon
-build_one
+BUILD_ARCH=$1
 
-##armeabi-v7a
-ARCH=arm
-EABI=armeabi-v7a
-SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm/
-TOOLCHAINS=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
-OPTIMIZE_CFLAGS="-O3 -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8"
-ADDITIONAL_CONFIGURE_FLAG=--enable-neon
-build_one
+if [ -z "$BUILD_ARCH" ]; then
+    echo "You must specific an architecture 'armv5, armv7a, armv7aneon, arm64, x86, x86_64...'."
+    echo ""
+    exit 1
+fi
 
-##arm64-v8a
-ARCH=arm
-EABI=arm64-v8a
-SYSROOT=$NDK/platforms/$PLATFORMS/arch-arm64/
-TOOLCHAINS=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
-OPTIMIZE_CFLAGS="-march=armv8-a -D__ANDROID__ -D__ARM_ARCH_8__ -D__ARM_ARCH_8A__"
-ADDITIONAL_CONFIGURE_FLAG=--disable-neon
-OPTIM=--disable-asm # must disable asm optimized in 64 arch
-build_one
+TOOLCHAIN_DIR=`pwd`/toolchain/$BUILD_ARCH
+SYSROOT=$TOOLCHAIN_DIR/sysroot/
 
-##x86
-ARCH=x86
-EABI=x86
-SYSROOT=$NDK/platforms/$PLATFORMS/arch-x86/
-TOOLCHAINS=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-
-OPTIMIZE_CFLAGS="-march=i686 -mtune=i686 -m32 -mmmx -msse2 -msse3 -mssse3 -D__ANDROID__ -D__i686__"
-ADDITIONAL_CONFIGURE_FLAG=--disable-neon
-OPTIM=--disable-asm # must disable asm optimized in x86 arch
-build_one
+if [ "$BUILD_ARCH" = "armv7a" ]; then
+	ARCH=arm
+	EABI=armeabi-v7a
+        TOOLCHAIN=arm-linux-androideabi-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/$TOOLCHAIN
+	EXTRA_CFLAGS="-march=armv7-a -mcpu=cortex-a8 -mfpu=vfpv3-d16 -mfloat-abi=softfp -mthumb"
+        EXTRA_LDFLAGS="-march=armv7-a -Wl,--fix-cortex-a8"
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=cortex-a8 --enable-thumb"
+elif [ "$BUILD_ARCH" = "armv5" ]; then
+	ARCH=arm
+	EABI=armeabi
+        TOOLCHAIN=arm-linux-androideabi-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/$TOOLCHAIN
+	EXTRA_CFLAGS="-march=armv5te -mtune=arm9tdmi -msoft-float"
+	ADDITIONAL_CONFIGURE_FLAG="--disable-neon"
+elif [ "$BUILD_ARCH" = "armv7aneon" ]; then
+	ARCH=arm
+	EABI=armeabi-v7a
+        TOOLCHAIN=arm-linux-androideabi-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/$TOOLCHAIN
+	EXTRA_CFLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
+        EXTRA_LDFLAGS="-march=armv7-a -Wl,--fix-cortex-a8"
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=cortex-a8 --enable-thumb --enable-neon"
+elif [ "$BUILD_ARCH" = "arm64" ]; then
+	ARCH=arm64
+	EABI=arm64-v8a
+        TOOLCHAIN=aarch64-linux-android-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/$TOOLCHAIN
+	ADDITIONAL_CONFIGURE_FLAG="--enable-thumb"
+elif [ "$BUILD_ARCH" = "x86" ]; then
+	ARCH=x86
+	EABI=x86	
+        TOOLCHAIN=x86-linux-android-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/i686-linux-android-
+	EXTRA_CFLAGS="-march=atom -msse3 -ffast-math -mfpmath=sse"
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=i686 --disable-yasm"
+elif [ "$BUILD_ARCH" = "x86_64" ]; then
+	ARCH=x86_64
+	EABI=x86_64	
+	TOOLCHAIN=x86_64-linux-android-
+        ROSSPREFIX=$TOOLCHAIN_DIR/bin/$TOOLCHAIN
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=x86_64 --disable-yasm"
+else
+	echo "unknow architechure $BUILD_ARCH"
+        echo "You must specific an architecture 'armv5, armv7a, armv7aneon, arm64, x86, x86_64...'."
+	exit 1
+fi
 
-##x86_64
-ARCH=x86
-EABI=x86_64
-SYSROOT=$NDK/platforms/$PLATFORMS/arch-x86_64/
-TOOLCHAINS=$NDK/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin/x86_64-linux-android-
-OPTIMIZE_CFLAGS="-march=core-avx-i -mtune=core-avx-i -m64 -mmmx -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mpopcnt -D__ANDROID__ -D__x86_64__"
-ADDITIONAL_CONFIGURE_FLAG=--disable-neon
-OPTIM=--disable-asm # must disable asm optimized in x86_64 arch
+make_toolchain
 build_one
