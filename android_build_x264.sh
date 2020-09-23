@@ -10,12 +10,44 @@
 #
 #############################################################
 
-export NDK=/home/kuwo/devtools/android-ndk-r13
+export NDK=/home/angzangy/android-ndk-r12b
+
+### armeabi-v7a neon ###
+SYSROOT=$NDK/platforms/android-9/arch-arm/
+CROSS_PREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
+EXTRA_CFLAGS="-march=armv7-a -mfloat-abi=softfp -mfpu=neon -mthumb -D__ANDROID__ -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__ -D__ARM_ARCH_7R__ -D__ARM_ARCH_7M__ -D__ARM_ARCH_7S__"
+EXTRA_LDFLAGS="-nostdlib"
+PREFIX=`pwd`/../x264libs/armeabi-v7a-neon
+
+./configure --prefix=$PREFIX \
+        --host=arm-linux-androideabi \
+        --sysroot=$SYSROOT \
+        --cross-prefix=$CROSS_PREFIX \
+        --extra-cflags="$EXTRA_CFLAGS" \
+        --extra-ldflags="$EXTRA_LDFLAGS" \
+        --enable-pic \
+        --enable-static \
+        --disable-shared \
+        --disable-asm \
+        --enable-strip \
+        --disable-cli \
+        --disable-win32thread \
+        --disable-avs \
+        --disable-swscale \
+        --disable-lavf \
+        --disable-ffms \
+        --disable-gpac \
+        --disable-lsmash
+
+make clean
+make -j4
+make install
+make distclean
 
 ### armeabi-v7a ###
 SYSROOT=$NDK/platforms/android-9/arch-arm/
 CROSS_PREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
-EXTRA_CFLAGS="-march=armv7-a -mfloat-abi=softfp -mfpu=neon -mthumb -D__ANDROID__ -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__ -D__ARM_ARCH_7R__ -D__ARM_ARCH_7M__ -D__ARM_ARCH_7S__"
+EXTRA_CFLAGS="-march=armv7-a -mfloat-abi=softfp -mfpu=vfp -mthumb -D__ANDROID__ -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__ -D__ARM_ARCH_7R__ -D__ARM_ARCH_7M__ -D__ARM_ARCH_7S__"
 EXTRA_LDFLAGS="-nostdlib"
 PREFIX=`pwd`/../x264libs/armeabi-v7a
 
