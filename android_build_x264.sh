@@ -10,7 +10,7 @@
 #
 #############################################################
 
-export NDK=/home/angzangy/android-ndk-r12b
+export NDK=/home/angzangy/android-ndk-r13b
 
 ### armeabi-v7a neon ###
 SYSROOT=$NDK/platforms/android-9/arch-arm/
