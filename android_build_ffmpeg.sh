@@ -24,6 +24,7 @@ function build_one
     --enable-mediacodec \
     --enable-hwaccel=h264_mediacodec \
     --enable-decoder=h264_mediacodec \
+    --enable-encoder=h264_mediacodec \
     --enable-runtime-cpudetect \
     --disable-doc \
     --disable-ffmpeg \
@@ -63,33 +64,33 @@ if [ "$BUILD_ARCH" = "armv7a" ]; then
         ROSSPREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 	SYSROOT=$NDK/platforms/android-21/arch-arm
 	EXTRA_CFLAGS="-mfpu=vfp -mfloat-abi=softfp"
-	ADDITIONAL_CONFIGURE_FLAG="--disable-neon"
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=armv7-a --disable-neon"
 elif [ "$BUILD_ARCH" = "armv5" ]; then
 	ARCH=arm
 	EABI=armeabi
         ROSSPREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 	SYSROOT=$NDK/platforms/android-21/arch-arm
-	EXTRA_CFLAGS="-march=armv5te -mtune=arm9tdmi -msoft-float"
+	EXTRA_CFLAGS="-march=armv5te -msoft-float"
 	ADDITIONAL_CONFIGURE_FLAG="--disable-neon"
 elif [ "$BUILD_ARCH" = "armv7aneon" ]; then
 	ARCH=arm
-	EABI=armeabi-v7a
+	EABI=armeabi-v7a-neon
+	CPU=armv7-a
         ROSSPREFIX=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 	SYSROOT=$NDK/platforms/android-21/arch-arm
 	EXTRA_CFLAGS="-mfpu=neon -mfloat-abi=softfp"
-	ADDITIONAL_CONFIGURE_FLAG="--enable-neon --disable-asm"
+	ADDITIONAL_CONFIGURE_FLAG="--cpu=armv7-a --enable-neon --disable-asm"
 elif [ "$BUILD_ARCH" = "arm64" ]; then
 	ARCH=arm64
 	EABI=arm64-v8a
         ROSSPREFIX=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
 	SYSROOT=$NDK/platforms/android-21/arch-arm64
-	ADDITIONAL_CONFIGURE_FLAG=
 elif [ "$BUILD_ARCH" = "x86" ]; then
 	ARCH=x86
 	EABI=x86
         ROSSPREFIX=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-
 	SYSROOT=$NDK/platforms/android-21/arch-x86
-	EXTRA_CFLAGS="-march=atom -msse3 -ffast-math -mfpmath=sse"
+	EXTRA_CFLAGS="-msse3 -ffast-math -mfpmath=sse"
 	ADDITIONAL_CONFIGURE_FLAG="--cpu=i686 --disable-yasm"
 elif [ "$BUILD_ARCH" = "x86_64" ]; then
 	ARCH=x86_64
