@@ -17,7 +17,7 @@ old_library='libfdk-aac.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/home/angzangy/FFmpeg_Android/fdk-aac-2.0.1/toolchain/x86/sysroot/usr/lib -lm'
+dependency_libs=' -L/home/angzangy/android-ndk-r13b/platforms/android-21/arch-x86/usr/lib -lm'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
